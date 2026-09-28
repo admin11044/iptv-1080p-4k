@@ -30,6 +30,11 @@ EPG = "https://live.fanmingming.com/e.xml"  # 通用节目单（支持 EPG 的�
 # 清晰度关键词（用于筛选 1080P / 4K）
 HD_KEYWORDS = re.compile(r"(1080|全高清|超清|高清|hd|fhd|蓝光|bluray)", re.I)
 UHD_KEYWORDS = re.compile(r"(4k|2160|uhd|ultra)", re.I)
+# 低质/低码率/模糊标签：命中即剔除（用户要求只要高码率 1080P/4K）
+LOW_QUALITY = re.compile(
+    r"(240|360|480|576|720|sd|标清|流畅|普清|低清|ld|came|camrip|tc|ts|省流|极速|流畅版|马赛克|卡顿)",
+    re.I,
+)
 
 
 def parse_m3u(text):
@@ -106,6 +111,12 @@ def is_hd(name, attrs):
     return bool(HD_KEYWORDS.search(s)) or is_uhd(name, attrs)
 
 
+def is_low_quality(name, attrs):
+    """低码率/模糊/标清/720P 等明确低质标签 → 剔除"""
+    s = f"{name} {attrs.get('group-title', '')}"
+    return bool(LOW_QUALITY.search(s))
+
+
 def write_m3u(path, items):
     with open(path, "w", encoding="utf-8") as f:
         f.write(f'#EXTM3U x-tvg-url="{EPG}"\n')
@@ -172,12 +183,17 @@ def main():
         items = [it for it in items if alive.get(it[0][1], True)]
         print(f"[INFO] 校验后存活频道数: {len(items)}")
 
+    # 3.5) 剔除低码率/模糊/标清/720P 等低质频道（用户要求只保留高码率 1080P/4K）
+    before = len(items)
+    items = [it for it in items if not is_low_quality(it[0][0], it[1])]
+    print(f"[INFO] 剔除低质频道: {before - len(items)} | 剩余: {len(items)}")
+
     if only_hd:
-        items = [it for it in items if is_hd(*it[0])]
+        items = [it for it in items if is_hd(it[0][0], it[1])]
 
     # 4) 清晰度筛选
-    hd_items = [it for it in items if is_hd(*it[0])]
-    uhd_items = [it for it in items if is_uhd(*it[0])]
+    hd_items = [it for it in items if is_hd(it[0][0], it[1])]
+    uhd_items = [it for it in items if is_uhd(it[0][0], it[1])]
 
     os.makedirs(OUT_DIR, exist_ok=True)
     write_m3u(os.path.join(OUT_DIR, "index.m3u"), items)
