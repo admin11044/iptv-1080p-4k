@@ -47,7 +47,26 @@ OK影视 添加步骤：
 > 想要 1080P 为主就订阅 `hd.m3u`；只想要 4K/UHD 就订阅 `4k.m3u`；全量选 `index.m3u`。
 > 部分 TVBox 内核的 OK影视 版本也接受 `index.txt`（DIYP 格式）。
 
+## 本仓库现成订阅链接（直接复制粘贴）
+
+仓库已设为**公开**，下面是即拷即用的镜像链接（国内优先用 ghproxy.net；若打不开换 ghfast.top / gh.llkk.cc）：
+
+- **4K / UHD（6 路真 4K 源）**
+  `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/4k.m3u`
+- **1080P+（33 路高码率 1080P 源）**
+  `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/hd.m3u`
+- **全量（已剔除低质，约 1700 路）**
+  `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/index.m3u`
+- **OK影视 TXT 格式（DIYP / #genre# 分组）**
+  `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/index.txt`
+
+裸链备用（国内可能慢/被墙）：
+`https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/4k.m3u`
+
 ## 关于「1080P / 4K」的实话
+- **低质频道已强制剔除**：脚本在筛选时直接丢弃名称/分组里含
+  `240/360/480/576/720/标清/流畅/普清/低清/CAM/省流` 等低码率、模糊标签的频道，
+  只保留明确标注 `1080P/全高清/超清/蓝光` 及 `4K/2160/UHD` 的**高码率**源（见 `collect.py` 的 `LOW_QUALITY`）。
 - 免费公开直播源里**真正稳定 4K 的极少**，多为 1080P，且会随源变动。
   fanmingming 等源带有 CCTV 4K 测试频道，会被 `4k.m3u` 收录。
 - 清晰度筛选是按**频道名/分组里的关键词**（如 “4K”“1080P”“超清”）匹配的，
