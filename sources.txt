@@ -6,4 +6,13 @@
 
 # —— 范明明直播源（国内主流，央视/卫视高清，广东联通运营商 CDN，真·高码率）——
 # index.m3u：卫视高清 / 央视高清（IPv4 可直连，覆盖最广，含 CCTV-4K）
+# 放在第一位：带台标与分组，按 URL 去重时优先胜出
 https://live.fanmingming.com/tv/m3u/index.m3u
+
+# —— iptvjs 直播源（国内，央视台/卫视台/大量省级卫视，各省电信联通网关，纯中文频道）——
+# 补充省级卫视覆盖（北京/东方/湖南/江苏/浙江…共 40+ 卫视），与上面去重后互补
+https://raw.githubusercontent.com/iptvjs/iptvjs.github.io/main/j_m3u_iptv.m3u
+
+# —— kaige-cai/live（国内可直连项目，含 CCTV-4K/8K、欢笑剧场4K、咪咕4K 等超高清）——
+# 重点补齐 4K/8K 超高清频道（BesTV / 中国移动 OTT CDN，全国可达）
+https://raw.githubusercontent.com/kaige-cai/live/main/live.m3u

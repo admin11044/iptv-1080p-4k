@@ -153,10 +153,11 @@ def has_bad_marker(name, attrs):
 def normalize_group(name, g):
     """把杂乱分组规范为干净的顶层分组（适配 OK影视 / TVBox 菜单）。"""
     s = f"{name} {g}"
+    # 4K/8K 优先归类，保证所有超高清频道集中在「4K超清」，分组更直观
+    if re.search(r"4K|2160|UHD|超高清|8K", s):
+        return "4K超清"
     if re.search(r"CCTV|CGTN|央视|中央", s):
         return "央视频道"
-    if re.search(r"4K|2160|UHD|超高清", s):
-        return "4K超清"
     if re.search(r"卫视", name):
         return "卫视频道"
     if re.search(r"体育|运动|NBA|足球|篮球|赛事|奥运", s):
@@ -205,7 +206,6 @@ def write_txt(path, items):
 
 def main():
     validate = os.environ.get("VALIDATE", "1") == "1"
-    only_hd = os.environ.get("ONLY_HD", "0") == "1"
 
     # 1) 读取源列表
     sources = []
@@ -217,61 +217,61 @@ def main():
             sources.append(ln)
     print(f"[INFO] 源数量: {len(sources)}")
 
-    # 2) 拉取 + 解析 + 去重
-    seen = {}
+    # 2) 拉取 + 解析 + 按 URL 去重
+    #    同 URL 只保留首个源（sources.txt 中靠前的源优先，带台标/分组的源胜出）
+    seen = {}  # url -> (name, attrs)
     for url in sources:
         text = fetch_source(url)
         if not text:
             continue
         for name, u, attrs in parse_m3u(text):
-            key = (name, u)
-            if key not in seen:
-                seen[key] = attrs
-    print(f"[INFO] 去重后频道数: {len(seen)}")
+            if u not in seen:
+                seen[u] = (name, attrs)
+    items = [((name, u), attrs) for u, (name, attrs) in seen.items()]
+    print(f"[INFO] 按URL去重后频道数: {len(items)}")
 
-    items = list(seen.items())
+    # 3) 精选：仅保留「中国频道 + 1080P/4K」，剔除低质/标记/海外伪高清
+    #    —— 这是本仓库唯一对外输出的列表，从源头杜绝卡顿与分组混乱
+    before = len(items)
+    curated = [
+        it for it in items
+        if is_hd(it[0][0], it[1]) and is_chinese(it[0][0])
+        and not has_bad_marker(it[0][0], it[1])
+        and not is_low_quality(it[0][0], it[1])
+    ]
+    print(f"[INFO] 精选(中国+1080P/4K): {len(curated)} (从 {before} 过滤)")
 
-    # 3) 存活校验（并发）
+    # 4) 存活校验（仅对精选集；只删明确 404/410，超时/403 视为「中国能播、海外测不了」而保留）
     if validate:
-        urls = [u for (_, u), _ in items]
+        urls = [u for (_, u), _ in curated]
         alive = {}
         with cf.ThreadPoolExecutor(max_workers=32) as ex:
             fut = {ex.submit(check_alive, u): u for u in urls}
             for i, f in enumerate(cf.as_completed(fut), 1):
                 alive[fut[f]] = f.result()
-                if i % 300 == 0:
+                if i % 100 == 0:
                     print(f"[INFO] 校验进度 {i}/{len(urls)}")
-        items = [it for it in items if alive.get(it[0][1], False)]
-        print(f"[INFO] 校验后存活频道数: {len(items)}")
+        curated = [it for it in curated if alive.get(it[0][1], False)]
+        print(f"[INFO] 校验后精选频道数: {len(curated)}")
 
-    # 3.5) 剔除不可用标记 & 低码率/模糊/标清/720P 等低质频道
-    before = len(items)
-    items = [it for it in items if not has_bad_marker(it[0][0], it[1])]
-    items = [it for it in items if not is_low_quality(it[0][0], it[1])]
-    print(f"[INFO] 剔除标记/低质频道: {before - len(items)} | 剩余: {len(items)}")
+    # 5) 4K/UHD 子集（同样仅中国频道）
+    uhd_items = [it for it in curated if is_uhd(it[0][0], it[1]) and is_chinese(it[0][0])]
 
-    if only_hd:
-        items = [it for it in items if is_hd(it[0][0], it[1]) and is_chinese(it[0][0])]
-
-    # 4) 清晰度筛选（HD/4K 仅保留中国频道，剔除海外伪高清）
-    hd_items = [it for it in items if is_hd(it[0][0], it[1]) and is_chinese(it[0][0])]
-    uhd_items = [it for it in items if is_uhd(it[0][0], it[1]) and is_chinese(it[0][0])]
-
-    # 5) 规范分组（在输出前统一改写 group-title）
-    for (name, _), attrs in items:
+    # 6) 规范分组（在输出前统一改写 group-title）
+    for (name, _), attrs in curated:
         attrs["group-title"] = normalize_group(name, attrs.get("group-title", ""))
 
     os.makedirs(OUT_DIR, exist_ok=True)
-    write_m3u(os.path.join(OUT_DIR, "index.m3u"), items)
-    write_m3u(os.path.join(OUT_DIR, "hd.m3u"), hd_items)
+    write_m3u(os.path.join(OUT_DIR, "index.m3u"), curated)
+    write_m3u(os.path.join(OUT_DIR, "hd.m3u"), curated)
     write_m3u(os.path.join(OUT_DIR, "4k.m3u"), uhd_items)
-    write_txt(os.path.join(OUT_DIR, "index.txt"), items)
+    write_txt(os.path.join(OUT_DIR, "index.txt"), curated)
 
     with open(os.path.join(OUT_DIR, "stats.txt"), "w", encoding="utf-8") as f:
         f.write(f"更新时间(UTC): {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write(f"全量频道: {len(items)}\n1080P+: {len(hd_items)}\n4K/UHD: {len(uhd_items)}\n")
+        f.write(f"高清精选(1080P+): {len(curated)}\n4K/UHD: {len(uhd_items)}\n")
 
-    print(f"[DONE] 全量 {len(items)} | 1080P+ {len(hd_items)} | 4K/UHD {len(uhd_items)}")
+    print(f"[DONE] 高清精选 {len(curated)} | 4K/UHD {len(uhd_items)}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,5 @@
+.venv_dryrun/
+__pycache__/
+*.pyc
+
+.git_creds_tmp
