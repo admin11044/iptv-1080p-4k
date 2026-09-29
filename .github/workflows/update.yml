@@ -31,7 +31,7 @@ jobs:
 
       - name: Collect & Validate
         env:
-          VALIDATE: "1"
+          VALIDATE: "1"   # 只删明确 404/410 的死链；超时/403 视为「中国能播、海外测不了」而保留，避免误清空国内源
         run: python collect.py
 
       - name: Commit results

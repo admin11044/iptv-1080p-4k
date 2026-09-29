@@ -4,9 +4,9 @@
 去重 + 按清晰度筛选，输出 M3U / TXT，直接在 **OK影视** 里订阅，全程无需手动维护。
 
 ## 它做什么
-1. 从 `sources.txt` 读取一批公开 M3U 源（fanmingming / iptv-org / Free-TV 等）。
+1. 从 `sources.txt` 读取**仅限国内可直连**的直播源（fanmingming 等），从源头杜绝海外源导致卡顿。
 2. 合并、按「频道名+URL」去重。
-3. 并发存活校验（HEAD 探测，失败回退 GET 首字节），自动剔除死链。
+3. 并发存活校验：**只删除明确失效（HTTP 404/410）的死链**；超时/403 视为「中国能播、海外节点测不了」而保留，避免误清空国内源。
 4. 按清晰度筛选，生成 4 个产物：
    - `output/index.m3u` —— 全量存活频道
    - `output/hd.m3u`   —— 1080P / 全高清 / 蓝光（含 4K）
@@ -49,29 +49,34 @@ OK影视 添加步骤：
 
 ## 本仓库现成订阅链接（直接复制粘贴）
 
-仓库已设为**公开**，下面是即拷即用的镜像链接（国内优先用 ghproxy.net；若打不开换 ghfast.top / gh.llkk.cc）：
+仓库已设为**公开**，下面是即拷即用的镜像链接（国内优先用 ghproxy.net；若打不开换 ghfast.top / gh.llkk.cc）。
+**列表已重做为「仅中国源、去海外、分组规范」，频道数量随源站实时变化，以仓库内 `output/stats.txt` 为准。**
 
-- **4K / UHD（6 路真 4K 源）**
+- **4K / UHD（真 4K，如 CCTV-4K 超高清）**
   `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/4k.m3u`
-- **1080P+（33 路高码率 1080P 源）**
+- **1080P+（央视 + 卫视高清，高码率）**
   `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/hd.m3u`
-- **全量（已剔除低质，约 1700 路）**
+- **全量（央视 / 卫视 / 地方，已全部剔除非中国与低质）**
   `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/index.m3u`
 - **OK影视 TXT 格式（DIYP / #genre# 分组）**
   `https://ghproxy.net/https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/index.txt`
 
 裸链备用（国内可能慢/被墙）：
-`https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/4k.m3u`
+`https://raw.githubusercontent.com/admin11044/iptv-1080p-4k/main/output/index.m3u`
 
-## 关于「1080P / 4K」的实话
+## 关于「1080P / 4K」与卡顿的实话
+- **已彻底改为「仅中国源」**：删除了原先混入的 Free-TV / iptv-org 等全球源（Italy、Greece、UK…
+  那些就是卡顿的根因）。现在源站只有 fanmingming（央视/卫视高清，走广东联通等国内运营商 CDN）。
 - **低质频道已强制剔除**：脚本在筛选时直接丢弃名称/分组里含
   `240/360/480/576/720/标清/流畅/普清/低清/CAM/省流` 等低码率、模糊标签的频道，
-  只保留明确标注 `1080P/全高清/超清/蓝光` 及 `4K/2160/UHD` 的**高码率**源（见 `collect.py` 的 `LOW_QUALITY`）。
-- 免费公开直播源里**真正稳定 4K 的极少**，多为 1080P，且会随源变动。
-  fanmingming 等源带有 CCTV 4K 测试频道，会被 `4k.m3u` 收录。
-- 清晰度筛选是按**频道名/分组里的关键词**（如 “4K”“1080P”“超清”）匹配的，
-  并不能 100% 保证物理分辨率——脚本不做逐流码率探测（太重、易误杀）。
-- 存活校验只验证「链接可达」，不验证画质与流畅度；播放卡顿多半是源本身或网络问题。
+  并剔除 `[Geo-blocked]` / `[Not 24/7]` 等不可用标记（见 `collect.py` 的 `LOW_QUALITY` / `BAD_MARKERS`）。
+- **分组已重新规范**：杂乱的中英文混合分组（Italy / Religious / Undefined…）被统一成
+  `央视频道 / 卫视频道 / 地方频道 / 4K超清 / 体育 / 港澳台 / 少儿 / 影视 / 纪实 / 新闻 / 其他`，
+  在 OK影视 里菜单干净不混乱（见 `collect.py` 的 `normalize_group`）。
+- 免费公开直播源里**真正稳定 4K 的极少**，目前 `4k.m3u` 以 CCTV-4K 超高清为主；
+  1080P 以央视/卫视高清为主。若想要更多省级台或 4K，可在 `sources.txt` 增删源后推送即生效。
+- 清晰度筛选按**频道名/分组关键词**匹配（如 “4K”“超高清”“高清”“卫视”），不做逐流码率探测；
+  存活校验只删明确 404/410 的死链，不验证画质与流畅度——播放卡顿多半是源本身或你的网络路由问题。
 
 ## 可选：开启 GitHub Pages（多一条更稳的访问线路）
 仓库 **Settings → Pages → Source** 选 `GitHub Actions`，

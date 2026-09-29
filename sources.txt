@@ -1,16 +1,9 @@
 # ============================================================
 #  直播源列表（一行一个 M3U 地址；# 开头为注释）
-#  说明：仅收录「公开可用」的聚合项目源，不托管任何内容。
+#  说明：只收录「国内可直连」的直播源，避免海外源导致卡顿。
 #  你可以自由增删下面的地址；改动后推送仓库即触发一次更新。
 # ============================================================
 
-# —— 国内可直连 + 完善台标 + 含 4K（fanmingming，强烈推荐首选）——
-https://live.fanmingming.com/tv/m3u/global.m3u
-https://live.fanmingming.com/tv/m3u/ipv6.m3u
-
-# —— 中国频道 + 体育（iptv-org，按国家/类别拆分，中文聚焦）——
-https://iptv-org.github.io/iptv/countries/cn.m3u
-https://iptv-org.github.io/iptv/categories/sports.m3u
-
-# —— 少而精的免费合法 HD 源（Free-TV；每个频道只留一条最佳 HD 源）——
-https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8
+# —— 范明明直播源（国内主流，央视/卫视高清，广东联通运营商 CDN，真·高码率）——
+# index.m3u：卫视高清 / 央视高清（IPv4 可直连，覆盖最广，含 CCTV-4K）
+https://live.fanmingming.com/tv/m3u/index.m3u
