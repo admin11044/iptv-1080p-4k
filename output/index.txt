@@ -1,5 +1,4 @@
 卫视频道,#genre#
-广东卫视,http://58.248.112.205:8006/GD_CUCC/G_GUANGDONG-CQ.m3u8?Authinfo=3iRp8RZG1d3hGsaPmj%2FtHfgbSbSCTYnboG1IAsnN%2B8QE6B7fY0qM5PCisIiFJCnl&p=GITV&area=GD_CUCC&mac=d4:38:44:a5:72:8b
 内蒙古卫视,https://livestream-bt.nmtv.cn/nmtv/2314general.m3u8?txSecret=dc348a27bd36fe1bd63562af5e7269ea&txTime=771EF880
 青海卫视,http://stream.qhbtv.com/qhws/sd/live.m3u8?_upt=f35a89681647856030
 浙江卫视,http://ali-m-l.cztv.com/channels/lantian/channel001/1080p.m3u8
@@ -67,6 +66,7 @@
 三沙卫视,https://live2.hnntv.cn/srs/tv/ssws.m3u8?_upt=73b6e7da1721732774
 湖南卫视快乐垂钓频道,http://phonews.qing.mgtv.com/nn_live/nn_x64/dWlwPTEwMy43MS43MC4xMDMmcWlkPSZzPTFjMDgzZTZlNWYwNTM1ZjI2ZjRmNjAyZDFhZDQ3MWI5JmVzPTE3MjE3Mjk0NTcmdXVpZD1jNzgyZTViNjcxZWI2YjRkNzhiMDUyMzU5YjYwMTQ0Zi02NzQ3NDY2NyZ2PTImYXM9MCZjZG5leF9pZD13c19waG9uZTM,/KLCDMPP360.m3u8
 延边卫视,https://live.ybtvyun.com/video/s10006-2f92b9e0b123/index.m3u8
+陕西农林卫视,http://stream.snrtv.com/sxbc-nl-bceiL8.m3u8
 安多卫视,http://stream.qhbtv.com/adws/playlist.m3u8?_upt=563fa1181721744621
 香港卫视,http://zhibo.hkstv.tv/livestream/mutfysrq/playlist.m3u8
 北京卫视,http://223.110.241.204:6610/gitv/live1/G_BEIJING-CQ/G_BEIJING-CQ/
