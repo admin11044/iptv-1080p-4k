@@ -367,8 +367,6 @@ http://zteres.sn.chinamobile.com:6060/000000001000/3000000010000005180/index.m3u
 http://zteres.sn.chinamobile.com:6060/000000001000/3000000010000015686/index.m3u8?channel-id=FifastbLive&Contentid=3000000010000015686&livemode=1&stbId=3
 #EXTINF:-1 tvg-name="卫视中文台" tvg-logo="" group-title="卫视频道",卫视中文台
 https://pull-f5-spe.ixigua.com/yeslivetv.com/728702601-711301277/index.m3u8?by=yeslivetv.com
-#EXTINF:-1 tvg-name="凤凰卫视资讯台" tvg-logo="" group-title="卫视频道",凤凰卫视资讯台
-https://pull-f5-spe.ixigua.com/yeslivetv.com/844227634-868790463/index.m3u8?by=yeslivetv.com
 #EXTINF:-1 tvg-name="凤凰卫视中文台" tvg-logo="" group-title="卫视频道",凤凰卫视中文台
 https://pull-f5-spe.ixigua.com/yeslivetv.com/9c7163f5-294a-4079-9064-7bf964124b8b/index.m3u8?by=yeslivetv.com
 #EXTINF:-1 tvg-name="8K UHD 测试" tvg-logo="" group-title="4K超清",8K UHD 测试
